@@ -14,8 +14,14 @@
     "uid": "^2.0.2"
   },
   "devDependencies": {
+    "alpine-router": "^0.1.2",
     "bun-types": "latest",
+    "eslint": "^8.56.0",
     "typed-html": "^3.0.1"
   },
-  "module": "src/index.tsx"
+  "module": "src/index.tsx",
+  "type": "module",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
 }
