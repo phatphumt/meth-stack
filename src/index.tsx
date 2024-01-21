@@ -1,9 +1,11 @@
 import { Elysia, t } from "elysia";
 import { html } from "@elysiajs/html";
 import { uid } from "uid";
+import { connect } from "mongoose";
+import { Todo, TodoType } from "./schema";
 /// <reference types="@kitajs/html/htmx.d.ts" />
 
-const thestuff: Todo[] = [];
+await connect(process.env.DATABASE_URL as string);
 
 const BaseHTML = ({ children }: Html.PropsWithChildren) => {
   return (
@@ -23,11 +25,21 @@ const BaseHTML = ({ children }: Html.PropsWithChildren) => {
 
 const app = new Elysia()
   .use(html())
-  .get("/todos", () => <TodoList todos={thestuff} />)
+  .get("/todos", async () => {
+    const a = await Todo.find();
+    const b: TodoType[] = a;
+    console.log(b);
+    let c: TodoType[] = [];
+    b.forEach(({ _id, completed, content, createdAt, updatedAt }) => {
+      c.push({ _id, completed, content, createdAt, updatedAt });
+    });
+    return <TodoList todos={c} />;
+  })
   .get("/", ({ html }) =>
     html(
       <BaseHTML>
         <body
+          hx-boost="true"
           class="flex w-full h-screen flex-col justify-center items-center"
           hx-get="/todos"
           hx-trigger="load"
@@ -38,11 +50,12 @@ const app = new Elysia()
   )
   .post(
     "/todos/toggle/:id",
-    ({ params }) => {
-      const todo = thestuff.find((e) => e.id === params.id);
+    async ({ params }) => {
+      const todo = await Todo.findById(params.id);
       if (todo) {
         todo.completed = !todo.completed;
-        return <TodoItem {...todo} />;
+        await todo.save();
+        return <TodoItem {...todo.toObject()} />;
       }
     },
     {
@@ -53,30 +66,47 @@ const app = new Elysia()
   )
   .delete(
     "/todos/:id",
-    ({ params }) => {
-      const todo = thestuff.find((e) => e.id === params.id);
-      if (todo) {
-        thestuff.splice(thestuff.indexOf(todo), 1);
-      }
+    async ({ params }) => {
+      await Todo.findByIdAndDelete(params.id);
     },
     { params: t.Object({ id: t.String() }) }
   )
   .post(
     "/todos",
-    ({ body }) => {
+    async ({ body }) => {
+      console.log;
       if (body.content.length === 0) {
         throw new Error("cant be empty bro");
       }
-      const newTodo: Todo = {
-        id: uid(5),
-        content: body.content,
+      const data = new Todo({
         completed: false,
-      };
-      thestuff.push(newTodo);
-      return <TodoItem {...newTodo} />;
+        content: body.content,
+      });
+      const a = await data.save();
+      console.log(a.content);
+      let c: TodoType[] = [];
+      return (
+        <TodoItem
+          {...{
+            _id: a._id,
+            completed: a.completed,
+            content: a.content,
+            createdAt: a.createdAt,
+            updatedAt: a.updatedAt,
+          }}
+        />
+      );
     },
     { body: t.Object({ content: t.String() }) }
   )
+  .get("/dbtest", async () => {
+    const data = new Todo({
+      completed: false,
+      content: "test123",
+    });
+    await data.save();
+    return "checkout the console!!!";
+  })
   .listen(8080);
 
 type Todo = {
@@ -85,20 +115,20 @@ type Todo = {
   completed: boolean;
 };
 
-function TodoItem({ id, content, completed }: Todo) {
+function TodoItem({ _id, content, completed }: TodoType) {
   return (
     <div class="flex space-x-3">
       <p>{content}</p>
       <input
         type="checkbox"
         checked={completed}
-        hx-post={`/todos/toggle/${id}`}
+        hx-post={`/todos/toggle/${_id}`}
         hx-target="closest div"
         hx-swap="outerHTML"
       />
       <button
         class="text-red-400 font-bold"
-        hx-delete={`/todos/${id}`}
+        hx-delete={`/todos/${_id}`}
         hx-target="closest div"
         hx-swap="outerHTML"
       >
@@ -108,13 +138,15 @@ function TodoItem({ id, content, completed }: Todo) {
   );
 }
 
-function TodoList({ todos }: { todos: Todo[] }) {
+function TodoList({ todos }: { todos: TodoType[] }) {
+  console.log(todos);
   return (
     <div class="flex flex-col">
       {todos.map((e) => (
         <TodoItem {...e} />
       ))}
       <TodoForm />
+      <a href="/test">to</a>
     </div>
   );
 }
@@ -130,6 +162,7 @@ function TodoForm() {
       >
         <input type="text" name="content" class="border border-black" />
         <button>add</button>
+        <p class="htmx-indicator">adding..</p>
       </form>
     </div>
   );
