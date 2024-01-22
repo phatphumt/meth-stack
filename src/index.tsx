@@ -3,6 +3,8 @@ import { html } from "@elysiajs/html";
 import { connect } from "mongoose";
 import api from "./api";
 import BaseHTML from "./components/BaseHTML";
+import BaseMETH from "./components/BaseMeth";
+import { emit, $emit } from "./utils/emit";
 /// <reference types="@kitajs/html/htmx.d.ts" />
 
 await connect(process.env.DATABASE_URL as string);
@@ -14,22 +16,22 @@ const app = new Elysia()
     "/",
     ({ html }) =>
       html(
-        <BaseHTML>
+        <BaseMETH>
           <body
             hx-boost="true"
             class="flex w-full h-screen flex-col justify-center items-center"
             hx-get="/api/todos"
-            hx-trigger="load, asdasd from:*"
+            hx-trigger="load, reloaded from:*"
             hx-swap="outerHTML"
           ></body>
-        </BaseHTML>
+        </BaseMETH>
       ),
-    {
-      afterHandle({ set }) {
-        set.headers["HX-Trigger"] = "asdasd";
-        console.log(set.headers["HX-Trigger"]);
-      },
-    }
+      $emit("reloaded")
+    // {
+    //   afterHandle(ctx) {
+    //     emit(ctx, "reloaded");
+    //   },
+    // }
   )
   .get("/test", ({ html }) =>
     html(
