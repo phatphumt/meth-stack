@@ -63,6 +63,9 @@ const api = new Elysia({ prefix: "/api" })
       c.push({ _id, completed, content, createdAt, updatedAt });
     });
     return <TodoList todos={c} />;
+  })
+  .get("/ding", async () => {
+    return <p>Ding! Ringed Server!</p>;
   });
 
 export default api;
