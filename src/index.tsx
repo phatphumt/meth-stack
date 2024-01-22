@@ -2,9 +2,9 @@ import { Elysia, t } from "elysia";
 import { Html, html } from "@elysiajs/html";
 import { connect } from "mongoose";
 import api from "./api";
-import BaseMETH from "./components/BaseMeth";
+import BaseMETH from "./utils/BaseMeth";
 import { $emitHeader } from "./utils/emit";
-import Link from "./components/Link";
+import Link from "./utils/Link";
 /// <reference types="@kitajs/html/htmx.d.ts" />
 
 await connect(process.env.DATABASE_URL as string);

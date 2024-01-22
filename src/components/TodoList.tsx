@@ -1,5 +1,5 @@
 import { TodoType } from "../schema";
-import Link from "./Link";
+import Link from "../utils/Link";
 import TodoForm from "./TodoForm";
 import TodoItem from "./TodoItem";
 

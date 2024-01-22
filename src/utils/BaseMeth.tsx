@@ -1,5 +1,5 @@
 import { Html } from "@kitajs/html";
-import { EmitInternals } from "../utils/emit";
+import { EmitInternals } from "./emit";
 
 export default function BaseMETH({ children }: Html.PropsWithChildren) {
     // if (children) x_emit(children);
