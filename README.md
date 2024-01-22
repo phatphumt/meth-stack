@@ -1,6 +1,7 @@
 # Simple Todolist with METH stack
 
 (MongoDB, Elysia, TailwindCSS, HTMX)
+
 To start the development server run:
 
 ```bash
