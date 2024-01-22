@@ -1,4 +1,5 @@
 import { TodoType } from "../schema";
+import Link from "./Link";
 import TodoForm from "./TodoForm";
 import TodoItem from "./TodoItem";
 
@@ -10,7 +11,7 @@ export function TodoList({ todos }: { todos: TodoType[] }) {
       ))}
       <div class="newcontent"></div>
       <TodoForm />
-      <a href="./test" hx-target="body">gjkasdghaszjk</a>
+      <Link href="/test">test</Link>
     </div>
   );
 }

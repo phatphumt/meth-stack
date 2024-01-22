@@ -1,13 +1,15 @@
 import { Elysia, t } from "elysia";
-import { html } from "@elysiajs/html";
+import { Html, html } from "@elysiajs/html";
 import { connect } from "mongoose";
 import api from "./api";
-import BaseHTML from "./components/BaseHTML";
 import BaseMETH from "./components/BaseMeth";
 import { $emitHeader } from "./utils/emit";
+import Link from "./components/Link";
 /// <reference types="@kitajs/html/htmx.d.ts" />
 
 await connect(process.env.DATABASE_URL as string);
+
+const port = process.env.PORT || 8080;
 
 const app = new Elysia()
   .use(html())
@@ -26,7 +28,7 @@ const app = new Elysia()
           ></body>
         </BaseMETH>
       ),
-      $emitHeader("reloaded")
+    $emitHeader("reloaded")
   )
   .get("/test", ({ html }) =>
     html(
@@ -36,19 +38,17 @@ const app = new Elysia()
           class="flex w-full h-screen flex-col justify-center items-center"
         >
           <div x-data="{clicked: 0}">
-              <p x-html="`Clicked ${clicked} times`"></p>
-              <button x-on:click="clicked--; $emit('ding')">-</button>
-              <button x-on:click="clicked++; $emit('ding')">+</button>
+            <p x-html="`Clicked ${clicked} times`"></p>
+            <button x-on:click="clicked--; $emit('ding')">-</button>
+            <button x-on:click="clicked++; $emit('ding')">+</button>
           </div>
           <p hx-trigger="ding from:body" hx-get="/api/ding"></p>
-          <a href="/" hx-target="body">
-            back
-          </a>
+          <Link href="/">back</Link>
         </body>
       </BaseMETH>
     )
   )
-  .listen(3000);
+  .listen(port);
 
 console.log(
   `server running at http://${app.server?.hostname}:${app.server?.port}`
