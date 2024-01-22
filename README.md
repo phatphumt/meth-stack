@@ -9,9 +9,9 @@ bun install
 bun run dev
 ```
 
+Open http://localhost:8080/ with your browser to see the result.
+
 ### Todo:
 
 - ~add a router~
 - add some auth stuff
-
-Open http://localhost:8080/ with your browser to see the result.
