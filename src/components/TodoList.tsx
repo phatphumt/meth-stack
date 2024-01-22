@@ -3,7 +3,6 @@ import TodoForm from "./TodoForm";
 import TodoItem from "./TodoItem";
 
 export function TodoList({ todos }: { todos: TodoType[] }) {
-  console.log(todos);
   return (
     <div class="flex flex-col">
       {todos.map((e) => (
@@ -11,7 +10,7 @@ export function TodoList({ todos }: { todos: TodoType[] }) {
       ))}
       <div class="newcontent"></div>
       <TodoForm />
-      <a href="/test">gjkasdghaszjk</a>
+      <a href="./test" hx-target="body">gjkasdghaszjk</a>
     </div>
   );
 }

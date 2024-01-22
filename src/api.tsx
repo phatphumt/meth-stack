@@ -58,7 +58,6 @@ const api = new Elysia({ prefix: "/api" })
   .get("/todos", async () => {
     const a = await Todo.find();
     const b: TodoType[] = a;
-    console.log(b);
     let c: TodoType[] = [];
     b.forEach(({ _id, completed, content, createdAt, updatedAt }) => {
       c.push({ _id, completed, content, createdAt, updatedAt });

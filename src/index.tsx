@@ -10,21 +10,26 @@ await connect(process.env.DATABASE_URL as string);
 const app = new Elysia()
   .use(html())
   .use(api)
-  .get("/", ({ html }) =>
-    html(
-      <BaseHTML>
-        <body
-          hx-boost="true"
-          class="flex w-full h-screen flex-col justify-center items-center"
-          hx-get="/api/todos"
-          hx-trigger="load"
-          hx-swap="outerHTML"
-          hx-target=".content"
-        >
-          <div class="content"></div>
-        </body>
-      </BaseHTML>
-    )
+  .get(
+    "/",
+    ({ html }) =>
+      html(
+        <BaseHTML>
+          <body
+            hx-boost="true"
+            class="flex w-full h-screen flex-col justify-center items-center"
+            hx-get="/api/todos"
+            hx-trigger="load, asdasd from:*"
+            hx-swap="outerHTML"
+          ></body>
+        </BaseHTML>
+      ),
+    {
+      afterHandle({ set }) {
+        set.headers["HX-Trigger"] = "asdasd";
+        console.log(set.headers["HX-Trigger"]);
+      },
+    }
   )
   .get("/test", ({ html }) =>
     html(
@@ -38,7 +43,9 @@ const app = new Elysia()
             consectetur commodi aspernatur esse, dolorem corporis impedit
             quaerat?
           </p>
-          <a href="/">back</a>
+          <a href="/" hx-target="body">
+            back
+          </a>
         </body>
       </BaseHTML>
     )
