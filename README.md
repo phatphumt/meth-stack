@@ -69,5 +69,6 @@ Emit custom event from Alpine to HTMX/Javascript. (Commonly used for responsive 
 
 - ~add a router~
 - add some auth stuff
+- i18n
 
 Open http://localhost:8080/ with your browser to see the result.
