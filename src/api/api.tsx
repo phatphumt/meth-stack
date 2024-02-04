@@ -1,73 +1,46 @@
+import { $ } from "bun";
 import Elysia from "elysia";
-import todos from "./todos/todos";
-import todosToggle from "./todos/toggle/toggle";
-import ding from "./ding/ding";
+console.clear();
 
-const api = new Elysia({ prefix: "/api" })
-  .use(todos)
-  .use(todosToggle)
-  .use(ding)
-  // .post(
-  //   "/todos/toggle/:id",
-  //   async ({ params }) => {
-  //     const todo = await Todo.findById(params.id);
-  //     if (todo) {
-  //       todo.completed = !todo.completed;
-  //       await todo.save();
-  //       return <TodoItem {...todo.toObject()} />;
-  //     }
-  //   },
-  //   {
-  //     params: t.Object({
-  //       id: t.String(),
-  //     }),
-  //   }
-  // )
-  // .delete(
-  //   "/todos/:id",
-  //   async ({ params }) => {
-  //     await Todo.findByIdAndDelete(params.id);
-  //   },
-  //   { params: t.Object({ id: t.String() }) }
-  // )
-  // .post(
-  //   "/todos",
-  //   async ({ body }) => {
-  //     console.log;
-  //     if (body.content.length === 0) {
-  //       throw new Error("cant be empty bro");
-  //     }
-  //     const data = new Todo({
-  //       completed: false,
-  //       content: body.content,
-  //     });
-  //     const a = await data.save();
-  //     console.log(a.content);
-  //     return (
-  //       <TodoItem
-  //         {...{
-  //           _id: a._id,
-  //           completed: a.completed,
-  //           content: a.content,
-  //           createdAt: a.createdAt,
-  //           updatedAt: a.updatedAt,
-  //         }}
-  //       />
-  //     );
-  //   },
-  //   { body: t.Object({ content: t.String() }) }
-  // )
-  // .get("/todos", async () => {
-  //   const a = await Todo.find();
-  //   const b: TodoType[] = a;
-  //   let c: TodoType[] = [];
-  //   b.forEach(({ _id, completed, content, createdAt, updatedAt }) => {
-  //     c.push({ _id, completed, content, createdAt, updatedAt });
-  //   });
-  //   return <TodoList todos={c} />;
-  // })
-  // .get("/ding", async () => {
-  //   return <p>Ding! Ringed Server!</p>;
-  // });
+const resp = (await $`cd ./src/api ; find . | grep "\\.tsx$"`.text())
+  .split("\n")
+  .filter(el => el && el !== "./api.tsx")
+
+const api = new Elysia({ prefix: "/api" });
+
+resp.forEach(async filepath => {
+  const routeName = filepath.substring(1, filepath.lastIndexOf('/'));
+  const fileName = filepath
+    .substring(filepath.lastIndexOf('/'))
+    .slice(1)
+    .replace(/\.tsx?$/g, "");
+  const module = (( await import(filepath) ).default);
+  if (Array.isArray(module)) {
+    switch (fileName) {
+      case "get":
+        //@ts-ignore
+        api.use(new Elysia({prefix: routeName}).get(...module)); break;
+      case "post":
+        //@ts-ignore
+        api.use(new Elysia({prefix: routeName}).post(...module)); break;
+      case "put":
+        //@ts-ignore
+        api.use(new Elysia({prefix: routeName}).put(...module)); break;
+      case "patch":
+        //@ts-ignore
+        api.use(new Elysia({prefix: routeName}).patch(...module)); break;
+      case "delete":
+        //@ts-ignore
+        api.use(new Elysia({prefix: routeName}).delete(...module)); break;
+    }
+  } else {
+    
+    api.use(
+      new Elysia({prefix: routeName}).use(module)
+    );
+  }
+  console.log("Generated: ", routeName);
+  }
+);
 
 export default api;
